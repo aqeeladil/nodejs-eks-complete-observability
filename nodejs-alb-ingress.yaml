@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nodejs-services-ingress
+  annotations:
+    kubernetes.io/ingress.class: "alb"  # Tells the ALB Ingress Controller to manage this Ingress
+    alb.ingress.kubernetes.io/scheme: internet-facing  # Make the ALB internet-facing
+    alb.ingress.kubernetes.io/target-type: ip  # Use IP targets for Kubernetes pods
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'  # Set HTTP port (80)
+    alb.ingress.kubernetes.io/healthcheck-path: "/healthy"  # Define the health check path
+spec:
+  rules:
+    - host: <your-domain-or-ip>  # Replace with your domain or use the ALB's DNS name
+      http:
+        paths:
+        - path: /service-a  # Path for Service A
+          pathType: Prefix
+          backend:
+            service:
+              name: service-a  # Name of Service A
+              port:
+                number: 3001  # Service A is exposed on port 3001
+        - path: /service-b  # Path for Service B
+          pathType: Prefix
+          backend:
+            service:
+              name: service-b  # Name of Service B
+              port:
+                number: 3002  # Service B is exposed on port 3002
